@@ -7,20 +7,20 @@ before_install:
 script:
   - npm test
   - if [ "${TRAVIS_BRANCH}" = "master" ]; then
-    git checkout ${TRAVIS_BRANCH};
-    git reset --hard ${TRAVIS_COMMIT};
-    git remote set-url origin ${CIVAR_GH_REPOSITORY_URL};
-    printf -- "//registry.npmjs.org/:_authToken=${CIVAR_NPM_TOKEN}" > ./.npmrc;
-    if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
-      COMMIT_MESSAGE="$(cat ./.commit_message)";
-      if [ -z "${COMMIT_MESSAGE##*"[major release]"*}" ]; then
-        zsc version bump --major;
-      elif [ -z "${COMMIT_MESSAGE##*"[minor release]"*}" ]; then
-        zsc version bump --minor;
-      else
-        zsc version bump --patch;
+      git checkout ${TRAVIS_BRANCH};
+      git reset --hard ${TRAVIS_COMMIT};
+      git remote set-url origin ${CIVAR_GH_REPOSITORY_URL};
+      printf -- "//registry.npmjs.org/:_authToken=${CIVAR_NPM_TOKEN}" > ./.npmrc;
+      if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+        COMMIT_MESSAGE="$(cat ./.commit_message)";
+        if [ -z "${COMMIT_MESSAGE##*"[major release]"*}" ]; then
+          zsc version bump --major;
+        elif [ -z "${COMMIT_MESSAGE##*"[minor release]"*}" ]; then
+          zsc version bump --minor;
+        else
+          zsc version bump --patch;
+        fi;
+        git push --tags;
+        zsc publish npm --auto;
       fi;
-      git push --tags;
-      zsc publish npm --auto;
     fi;
-  fi;
